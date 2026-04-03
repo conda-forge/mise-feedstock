@@ -1,6 +1,10 @@
 context:
   name: mise
+<<<<<<< 2026.4.3_h9a270f
   version: "2026.4.3"
+=======
+  version: "2026.4.2"
+>>>>>>> main
   # upstream refs: https://github.com/jdx/mise/blob/main/scripts/build-tarball.sh & https://github.com/jdx/mise/blob/main/scripts/build-tarball.ps1
   base_features: native-tls,rustls-native-roots,vfox/vendored-lua
   extra_features: ${{ ",aws-lc-rs" if target_platform == "linux-armv7l" else "" }}
@@ -11,7 +15,11 @@ package:
 
 source:
   url: https://github.com/jdx/mise/archive/refs/tags/v${{ version }}.tar.gz
+<<<<<<< 2026.4.3_h9a270f
   sha256: 8afc088e854702de4c0dd79b58d1ae827b8d2ed4e9d4d07cefdd29afc2ef5939
+=======
+  sha256: 810b9dfbd3485a55ca125084bbc7198adecf954125e6f2b64f1528f5e271490e
+>>>>>>> main
 
 build:
   number: 0
@@ -91,16 +99,20 @@ tests:
       files:
         - if: unix
           then:
-            - share/bash-completion/completions/mise
-            - share/fish/vendor_completions.d/mise.fish
-            - share/zsh/site-functions/_mise
             - share/man/man1/mise.1
+            - if: build_platform == host_platform
+              then:
+                - share/bash-completion/completions/mise
+                - share/fish/vendor_completions.d/mise.fish
+                - share/zsh/site-functions/_mise
         - if: win
           then:
-            - Library/share/bash-completion/completions/mise
-            - Library/share/fish/vendor_completions.d/mise.fish
-            - Library/share/zsh/site-functions/_mise
             - Library/share/man/man1/mise.1
+            - if: build_platform == host_platform
+              then:
+                - Library/share/bash-completion/completions/mise
+                - Library/share/fish/vendor_completions.d/mise.fish
+                - Library/share/zsh/site-functions/_mise
       strict: true
 
 about:
