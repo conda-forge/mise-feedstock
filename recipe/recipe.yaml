@@ -29,9 +29,8 @@ build:
           # write custom `mise self-update` message
           - echo 'message = "This version of mise was installed from conda-forge, a community-maintained channel of Conda packages. Use your Conda package manager (`conda`, `mamba`, `pixi` etc.) to update mise."' > "$PREFIX/lib/mise-self-update-instructions.toml"
           # copy manpage and generate shell completions
-          - mkdir -p "$PREFIX/share/man/man1"
+          - mkdir -p "$PREFIX/share/man/man1" "$PREFIX/share/bash-completion/completions" "$PREFIX/share/fish/vendor_completions.d" "$PREFIX/share/zsh/site-functions"
           - cp man/man1/mise.1 "$PREFIX/share/man/man1/mise.1"
-          - mkdir -p "$PREFIX/share/bash-completion/completions" "$PREFIX/share/fish/vendor_completions.d" "$PREFIX/share/zsh/site-functions"
           - '"$PREFIX/bin/mise" completion bash > "$PREFIX/share/bash-completion/completions/mise"'
           - '"$PREFIX/bin/mise" completion fish > "$PREFIX/share/fish/vendor_completions.d/mise.fish"'
           - '"$PREFIX/bin/mise" completion zsh  > "$PREFIX/share/zsh/site-functions/_mise"'
