@@ -25,7 +25,7 @@ build:
       - if: unix
         then:
           - export LIBCLANG_PATH="$BUILD_PREFIX"/lib
-          - cargo auditable install --no-track --locked --bins --no-default-features --features=${{ base_features }}${{ extra_features }} --root="$PREFIX" --path=.
+          - cargo auditable install --path=. --root="$PREFIX" --no-track --locked --bins --no-default-features --features=${{ base_features }}${{ extra_features }}
           # write custom `mise self-update` message
           - echo 'message = "This version of mise was installed from conda-forge, a community-maintained channel of Conda packages. Use your Conda package manager (`conda`, `mamba`, `pixi` etc.) to update mise."' > "$PREFIX"/lib/mise-self-update-instructions.toml
           # copy manpage and generate shell completions
@@ -39,8 +39,8 @@ build:
           # bindgen expects libclang.dll; conda-forge only provides versioned DLLs on Windows
           - powershell -Command "cp (gci $env:BUILD_PREFIX\Library\bin\libclang-*.dll)[0] $env:BUILD_PREFIX\Library\bin\libclang.dll"
           - set LIBCLANG_PATH="%BUILD_PREFIX%"\Library\bin
-          - cargo auditable install --no-track --locked --bins --no-default-features --features=${{ base_features }}${{ extra_features }} --root="%LIBRARY_PREFIX%" --path=.
-          - cargo auditable install --no-track --locked --bins --root="%LIBRARY_PREFIX%" --path=crates\mise-shim
+          - cargo auditable install --path=. --root="%LIBRARY_PREFIX%" --no-track --locked --bins --no-default-features --features=${{ base_features }}${{ extra_features }}
+          - cargo auditable install --path=crates\mise-shim --root="%LIBRARY_PREFIX%" --no-track --locked --bins
           # write custom `mise self-update` message
           - mkdir "%LIBRARY_PREFIX%"\lib
           - echo message = "This version of mise was installed from conda-forge, a community-maintained channel of Conda packages. Use your Conda package manager (`conda`, `mamba`, `pixi` etc.) to update mise."> "%LIBRARY_PREFIX%"\lib\mise-self-update-instructions.toml
