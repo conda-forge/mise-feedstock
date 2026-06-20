@@ -38,7 +38,7 @@ build:
         then:
           # bindgen expects libclang.dll; conda-forge only provides versioned DLLs on Windows
           - powershell -Command "cp (gci $env:BUILD_PREFIX\Library\bin\libclang-*.dll)[0] $env:BUILD_PREFIX\Library\bin\libclang.dll"
-          - set LIBCLANG_PATH="%BUILD_PREFIX%"\Library\bin
+          - set "LIBCLANG_PATH=%BUILD_PREFIX%\Library\bin"
           - cargo auditable install --path=. --root="%LIBRARY_PREFIX%" --no-track --locked --bins --no-default-features --features=${{ base_features }}${{ extra_features }}
           - cargo auditable install --path=crates\mise-shim --root="%LIBRARY_PREFIX%" --no-track --locked --bins
           # write custom `mise self-update` message
