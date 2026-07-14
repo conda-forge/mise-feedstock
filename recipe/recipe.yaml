@@ -18,7 +18,7 @@ build:
   script:
     env:
       AWS_LC_SYS_CMAKE_BUILDER: ${{ "1" if win else "0" }} # force CMake builder for `aws-lc-sys` native C/C++ code on Windows
-      CARGO_PROFILE_RELEASE_LTO: fat
+      CARGO_PROFILE_RELEASE_LTO: ${{ "fat" if build_platform == host_platform else "thin" }} # avoid `rustc-LLVM` out-of-memory error when cross-compiling 
       CARGO_PROFILE_RELEASE_STRIP: symbols
       OPENSSL_NO_VENDOR: 1
     content:
