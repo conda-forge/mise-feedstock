@@ -78,7 +78,7 @@ requirements:
     - ninja
     - pkg-config
   host:
-    - if: unix
+    - if: linux
       then: openssl
     - usage
 
