@@ -29,6 +29,7 @@ build:
           - export LIBCLANG_PATH="$BUILD_PREFIX"/lib
           - cargo auditable install --path=. --root="$PREFIX" --no-track --locked --bins --no-default-features --features=${{ base_features }}${{ extra_features }}
           # write custom `mise self-update` message
+          - mkdir -p "$PREFIX"/lib
           - echo 'message = "${{ self_update_msg }}"' > "$PREFIX"/lib/mise-self-update-instructions.toml
           # copy manpage
           - mkdir -p "$PREFIX"/share/man/man1
