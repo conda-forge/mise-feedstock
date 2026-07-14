@@ -3,6 +3,7 @@ context:
   # upstream refs: https://github.com/jdx/mise/blob/main/scripts/build-tarball.sh & https://github.com/jdx/mise/blob/main/scripts/build-tarball.ps1
   base_features: native-tls,rustls-native-roots,vfox/vendored-lua
   extra_features: ${{ ",aws-lc-rs" if target_platform == "linux-armv7l" else "" }}
+  self_update_msg: "This version of mise was installed from conda-forge, a community-maintained channel of Conda packages. Use your Conda package manager (`conda`, `mamba`, `pixi` etc.) to update mise."
 
 package:
   name: mise
@@ -16,6 +17,7 @@ build:
   number: 0
   script:
     env:
+      AWS_LC_SYS_CMAKE_BUILDER: ${{ "1" if win else "0" }} # force CMake builder for `aws-lc-sys` native C/C++ code on Windows
       CARGO_PROFILE_RELEASE_LTO: fat
       CARGO_PROFILE_RELEASE_STRIP: symbols
       OPENSSL_NO_VENDOR: 1
@@ -27,13 +29,17 @@ build:
           - export LIBCLANG_PATH="$BUILD_PREFIX"/lib
           - cargo auditable install --path=. --root="$PREFIX" --no-track --locked --bins --no-default-features --features=${{ base_features }}${{ extra_features }}
           # write custom `mise self-update` message
-          - echo 'message = "This version of mise was installed from conda-forge, a community-maintained channel of Conda packages. Use your Conda package manager (`conda`, `mamba`, `pixi` etc.) to update mise."' > "$PREFIX"/lib/mise-self-update-instructions.toml
-          # copy manpage and generate shell completions
-          - mkdir -p "$PREFIX"/share/man/man1 "$PREFIX"/share/bash-completion/completions "$PREFIX"/share/fish/vendor_completions.d "$PREFIX"/share/zsh/site-functions
-          - cp man/man1/mise.1                    "$PREFIX"/share/man/man1/mise.1
-          - '"$PREFIX"/bin/mise completion bash > "$PREFIX"/share/bash-completion/completions/mise'
-          - '"$PREFIX"/bin/mise completion fish > "$PREFIX"/share/fish/vendor_completions.d/mise.fish'
-          - '"$PREFIX"/bin/mise completion zsh  > "$PREFIX"/share/zsh/site-functions/_mise'
+          - echo 'message = "${{ self_update_msg }}"' > "$PREFIX"/lib/mise-self-update-instructions.toml
+          # copy manpage
+          - mkdir -p "$PREFIX"/share/man/man1
+          - cp man/man1/mise.1 "$PREFIX"/share/man/man1/mise.1
+          # generate shell completions
+          - if: build_platform == host_platform
+            then:
+              - mkdir -p "$PREFIX"/share/bash-completion/completions "$PREFIX"/share/fish/vendor_completions.d "$PREFIX"/share/zsh/site-functions
+              - '"$PREFIX"/bin/mise completion bash > "$PREFIX"/share/bash-completion/completions/mise'
+              - '"$PREFIX"/bin/mise completion fish > "$PREFIX"/share/fish/vendor_completions.d/mise.fish'
+              - '"$PREFIX"/bin/mise completion zsh  > "$PREFIX"/share/zsh/site-functions/_mise'
       - if: win
         then:
           # bindgen expects libclang.dll; conda-forge only provides versioned DLLs on Windows
@@ -43,16 +49,19 @@ build:
           - cargo auditable install --path=crates\mise-shim --root="%LIBRARY_PREFIX%" --no-track --locked --bins
           # write custom `mise self-update` message
           - if not exist "%LIBRARY_PREFIX%"\lib mkdir "%LIBRARY_PREFIX%"\lib
-          - echo message = "This version of mise was installed from conda-forge, a community-maintained channel of Conda packages. Use your Conda package manager (`conda`, `mamba`, `pixi` etc.) to update mise."> "%LIBRARY_PREFIX%"\lib\mise-self-update-instructions.toml
-          # copy manpage and generate shell completions
-          - if not exist "%LIBRARY_PREFIX%"\share\man\man1                    mkdir "%LIBRARY_PREFIX%"\share\man\man1
-          - if not exist "%LIBRARY_PREFIX%"\share\bash-completion\completions mkdir "%LIBRARY_PREFIX%"\share\bash-completion\completions
-          - if not exist "%LIBRARY_PREFIX%"\share\fish\vendor_completions.d   mkdir "%LIBRARY_PREFIX%"\share\fish\vendor_completions.d
-          - if not exist "%LIBRARY_PREFIX%"\share\zsh\site-functions          mkdir "%LIBRARY_PREFIX%"\share\zsh\site-functions
+          - echo message = "${{ self_update_msg }}"> "%LIBRARY_PREFIX%"\lib\mise-self-update-instructions.toml
+          # copy manpage
+          - if not exist "%LIBRARY_PREFIX%"\share\man\man1 mkdir "%LIBRARY_PREFIX%"\share\man\man1
           - powershell -Command "Copy-Item -Path 'man/man1/mise.1' -Destination '%LIBRARY_PREFIX%\share\man\man1\mise.1'"
-          - '"%LIBRARY_BIN%"\mise.exe completion bash > "%LIBRARY_PREFIX%\share\bash-completion\completions\mise"'
-          - '"%LIBRARY_BIN%"\mise.exe completion fish > "%LIBRARY_PREFIX%\share\fish\vendor_completions.d\mise.fish"'
-          - '"%LIBRARY_BIN%"\mise.exe completion zsh  > "%LIBRARY_PREFIX%\share\zsh\site-functions\_mise"'
+          # generate shell completions
+          - if: build_platform == host_platform
+            then:
+              - if not exist "%LIBRARY_PREFIX%"\share\bash-completion\completions mkdir "%LIBRARY_PREFIX%"\share\bash-completion\completions
+              - if not exist "%LIBRARY_PREFIX%"\share\fish\vendor_completions.d   mkdir "%LIBRARY_PREFIX%"\share\fish\vendor_completions.d
+              - if not exist "%LIBRARY_PREFIX%"\share\zsh\site-functions          mkdir "%LIBRARY_PREFIX%"\share\zsh\site-functions
+              - '"%LIBRARY_BIN%"\mise.exe completion bash > "%LIBRARY_PREFIX%\share\bash-completion\completions\mise"'
+              - '"%LIBRARY_BIN%"\mise.exe completion fish > "%LIBRARY_PREFIX%\share\fish\vendor_completions.d\mise.fish"'
+              - '"%LIBRARY_BIN%"\mise.exe completion zsh  > "%LIBRARY_PREFIX%\share\zsh\site-functions\_mise"'
       - cargo-bundle-licenses --format=yaml --output=./THIRDPARTY.yml
 
 requirements:
@@ -90,17 +99,21 @@ tests:
         - if: unix
           then:
             - lib/mise-self-update-instructions.toml
-            - share/bash-completion/completions/mise
-            - share/fish/vendor_completions.d/mise.fish
-            - share/zsh/site-functions/_mise
             - share/man/man1/mise.1
+            - if: build_platform == host_platform
+              then:
+                - share/bash-completion/completions/mise
+                - share/fish/vendor_completions.d/mise.fish
+                - share/zsh/site-functions/_mise
         - if: win
           then:
             - Library/lib/mise-self-update-instructions.toml
-            - Library/share/bash-completion/completions/mise
-            - Library/share/fish/vendor_completions.d/mise.fish
-            - Library/share/zsh/site-functions/_mise
             - Library/share/man/man1/mise.1
+            - if: build_platform == host_platform
+              then:
+                - Library/share/bash-completion/completions/mise
+                - Library/share/fish/vendor_completions.d/mise.fish
+                - Library/share/zsh/site-functions/_mise
       strict: true
 
 about:
