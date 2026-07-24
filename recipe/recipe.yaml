@@ -21,6 +21,11 @@ build:
       CARGO_PROFILE_RELEASE_LTO: ${{ "fat" if build_platform == host_platform else "thin" }} # avoid `rustc-LLVM` out-of-memory error when cross-compiling 
       CARGO_PROFILE_RELEASE_STRIP: symbols
       OPENSSL_NO_VENDOR: 1
+      # instruct `cc` crate to use clang-cl natively to compile build-time tools intended to be run on the host when cross-compiling from `win_64`
+      # (fixes compilation of `zstd-sys`)
+      AR_x86_64_pc_windows_msvc: llvm-lib
+      CC_x86_64_pc_windows_msvc: clang-cl
+      CXX_x86_64_pc_windows_msvc: clang-cl
     content:
       # NOTE: we have to set LIBCLANG_PATH for bindgen to find libclang
       # cf. https://github.com/conda-forge/clangdev-feedstock/issues/373 & https://github.com/rust-lang/rust-bindgen/issues/918
