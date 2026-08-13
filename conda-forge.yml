@@ -3,6 +3,8 @@ bot:
   version_updates:
     sources:
       - githubreleases
+build_platform:
+  win_arm64: win_64
 conda_build:
   error_overdepending: true
   error_overlinking: true
