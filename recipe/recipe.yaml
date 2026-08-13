@@ -20,7 +20,7 @@ build:
       AWS_LC_SYS_CMAKE_BUILDER: ${{ "1" if win else "0" }} # force CMake builder for `aws-lc-sys` native C/C++ code on Windows
       CARGO_PROFILE_RELEASE_LTO: "thin" # `rustc-LLVM` runs out of memory with `fat` LTO
       CARGO_PROFILE_RELEASE_STRIP: symbols
-      OPENSSL_NO_VENDOR: 1
+      OPENSSL_NO_VENDOR: "1"
       # instruct `cc` crate to use clang-cl natively to compile build-time tools intended to be run on the host when cross-compiling from `win_64`
       # (fixes compilation of `zstd-sys`)
       AR_x86_64_pc_windows_msvc: llvm-lib
