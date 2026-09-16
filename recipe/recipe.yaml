@@ -1,5 +1,5 @@
 context:
-  version: "2026.9.4"
+  version: "2026.9.9"
   # upstream refs: https://github.com/jdx/mise/blob/main/scripts/build-tarball.sh & https://github.com/jdx/mise/blob/main/scripts/build-tarball.ps1
   base_features: native-tls,rustls-native-roots,vfox/vendored-lua
   extra_features: ${{ ",aws-lc-rs" if target_platform == "linux-armv7l" else "" }}
@@ -11,10 +11,10 @@ package:
 
 source:
   url: https://github.com/jdx/mise/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 745a677234f0482e9ee6abaf897e220a2d8375f8a7868e8fb50833dedcb0c5fc
+  sha256: 96b461a471c9f35985611352b9d2c40cd7e66cc52496b1ad9bb64712fec677b2
 
 build:
-  number: 1
+  number: 0
   script:
     env:
       AWS_LC_SYS_CMAKE_BUILDER: ${{ "1" if win else "0" }} # force CMake builder for `aws-lc-sys` native C/C++ code on Windows
