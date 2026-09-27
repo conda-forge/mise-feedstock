@@ -1,5 +1,5 @@
 context:
-  version: "2026.9.14"
+  version: "2026.9.15"
   # upstream refs: https://github.com/jdx/mise/blob/main/scripts/build-tarball.sh & https://github.com/jdx/mise/blob/main/scripts/build-tarball.ps1
   base_features: native-tls,rustls-native-roots,vfox/vendored-lua
   extra_features: ${{ ",aws-lc-rs" if target_platform == "linux-armv7l" else "" }}
@@ -11,7 +11,7 @@ package:
 
 source:
   url: https://github.com/jdx/mise/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: c0cf95d16c47d772eff1e3972019d45966961c664237e366656dcfc978283090
+  sha256: 432d6e815bf1cd84a86ddbe6311db0bbae50d9228f3e6b2e9ae8588a69386e2e
 
 build:
   number: 0
