@@ -71,7 +71,7 @@ requirements:
     - make
     - ninja
     - nushell
-    - pkg-config
+    - pkgconf
   host:
     - if: linux
       then: openssl
